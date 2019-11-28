@@ -4,11 +4,7 @@ import shutil
 
 import geopandas as gpd
 
-import logging
-logging.basicConfig(format='{levelname}: {message!s}', style='{',
-                    level=logging.INFO)
-logger = logging.getLogger()
-
+from .log import *
 
 def filebasename(path, isurl=False):
     if isurl:
@@ -45,7 +41,7 @@ def download(url, dst=None, overwrite=False):
 
     if first_byte >= file_size:
         msg = "File '{}', size '{}' bytes, was already there."
-        logger.info(msg.format(dst, first_byte))
+        log(msg.format(dst, first_byte))
     else:
         header = {"Range": "bytes=%s-%s" % (first_byte, file_size)}
         if tqdm:
@@ -64,7 +60,7 @@ def download(url, dst=None, overwrite=False):
             pbar.close()
 
         msg = "File named '{}', sized {} bytes, downloaded succesfully."
-        logger.info(msg.format(dst, file_size))
+        log(msg.format(dst, file_size))
 
     return dst
 
@@ -99,8 +95,8 @@ def read_gpkg(filename, layers='all', features_only=False):
             _data = gpd.read_file(filename, layer=layer, driver='GPKG')
         except Exception as err:
             msg = "Layer '{!s}' from '{!s}' could not be read."
-            print(msg.format(layer, filebasename(filename)))
-            print("{!s}".format(err), file=sys.stderr)
+            log(msg.format(layer, filebasename(filename)))
+            logerr("{!s}".format(err))
         else:
             out[layer] = _data
     return out
@@ -110,5 +106,10 @@ def remove_dir(path):
         shutil.rmtree(path)
     except Exception as err:
         msg = "Something went wrong while cleaning '{!s}' temp directory:"
-        print(msg.format(path))
-        print("{!s}".format(err), file=sys.stderr)
+        log(msg.format(path))
+        logerr("{!s}".format(err))
+
+def create_tempdir():
+    import tempfile
+    tempdir = tempfile.mkdtemp()
+    return tempdir
