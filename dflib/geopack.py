@@ -62,7 +62,7 @@ class GeoPack(collections.UserDict):
             # if file is remote/url, we have to cache in a temp dir
             # download (remote) file to (local) temp directory
             try:
-                local_filename = utils.download(filename, dst=tempdir)
+                local_filename = utils.download(filename, dst=tempdir['path'])
             except:
                 self._remove_tempdir()
                 raise
